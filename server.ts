@@ -38,7 +38,7 @@ interface AuctionState {
 const auction: AuctionState = {
   currentBid: 5.00, // initial bid in USDT
   bidCount: 1,
-  timeRemaining: 300, // universal timer in seconds
+  timeRemaining: 20, // universal timer in seconds
   lastBidder: null,
   isActive: true
 };
@@ -51,12 +51,14 @@ const timerInterval = setInterval(() => {
   }
 
   if (auction.timeRemaining <= 0) {
-    auction.isActive = false;
-    clearInterval(timerInterval);
-    io.emit('auctionEnded', { 
-      winner: auction.lastBidder || "No bids"
-    });
-    console.log(`Auction ended. Winner: ${auction.lastBidder || "No bids"}`);
+    timeRemaining: 10
+    // auction.isActive = false;
+    // clearInterval(timerInterval);
+    // io.emit('auctionEnded', { 
+    //   winner: auction.lastBidder || "No bids"
+    // });
+    // console.log(`Auction ended. Winner: ${auction.lastBidder || "No bids"}`);
+
   } else {
     auction.timeRemaining--;
     io.emit('timerUpdate', { timeRemaining: auction.timeRemaining });
@@ -93,7 +95,7 @@ const placeBidHandler: RequestHandler = async (req: Request, res: Response): Pro
       return;
     }
     
-    const increment = 0.10; // Fixed increment in USDT
+    const increment = 0.01; // Fixed increment in USDT
     auction.currentBid += increment;
     auction.bidCount++;
     auction.lastBidder = bidderWallet;
