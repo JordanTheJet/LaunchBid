@@ -173,7 +173,7 @@
           <div class="flex space-x-3">
             <button id="placeBidBtn" class="flex-1 py-3 bg-primary rounded-xl text-white font-medium">
               <i class="material-icons mr-2" style="vertical-align: middle;">gavel</i>
-              Place Bid (will bid $5.10)
+              Place Bid
             </button>
           </div>
         </div>
@@ -359,7 +359,7 @@
       document.getElementById('currentBid').textContent = `$${usdt.toFixed(2)} USDT / ${ethEquivalent} ETH`;
       
       // Update the Place Bid button to show the next bid value
-      let nextBid = (usdt + 0.10).toFixed(2);
+      let nextBid = (usdt + 0.01).toFixed(2);
       document.getElementById('placeBidBtn').innerText = `Place Bid (will bid $${nextBid})`;
     }
     
@@ -474,10 +474,10 @@
       }
       
       // Calculate the new bid amount
-      let newBid = currentBid + 0.10; // new bid in USDT
+      let newBid = currentBid + 0.01; // new bid in USDT
       let bidFeeEth = (newBid * 0.0005).toFixed(6);
       
-      const companyWallet = "0x4b19581c2bA3e781f834b25C11D81A590AfACEA4"; // Company wallet
+      const companyWallet = "0x4b19581c2bA3e781f834b25C11D81A590AfACEA4"; // Company wallet hard coded
       try {
         const provider = new ethers.providers.Web3Provider(window.ethereum);
         const signer = provider.getSigner();
@@ -495,7 +495,7 @@
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
-            bidAmount: 0.10,  // fixed increment for the auction
+            bidAmount: 0.01,  // fixed increment for the auction
             bidderWallet: window.currentWallet,
             txHash: transactionResponse.hash
           })
