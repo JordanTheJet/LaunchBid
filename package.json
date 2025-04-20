@@ -1,0 +1,48 @@
+{
+  "name": "launchbid",
+  "version": "1.0.0",
+  "description": "",
+  "main": "dist/server.js",
+  "scripts": {
+    "dev": "ts-node server.ts",
+    "dev:react": "webpack serve --mode development",
+    "build": "tsc && webpack --mode production && cp -R public dist/public",
+    "start": "node dist/server.js"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/cors": "2.8.17",
+    "@types/express": "5.0.0",
+    "@types/node": "22.13.10",
+    "css-loader": "^7.1.2",
+    "html-webpack-plugin": "^5.6.3",
+    "style-loader": "^4.0.0",
+    "ts-loader": "^9.5.2",
+    "ts-node": "10.9.2",
+    "typescript": "5.8.2",
+    "webpack": "^5.99.6",
+    "webpack-cli": "^6.0.1",
+    "webpack-dev-server": "^5.2.1"
+  },
+  "dependencies": {
+    "@polkadot/api": "^10.0.0",
+    "@radiustechsystems/ai-agent-adapter-vercel-ai": "1.0.4",
+    "@radiustechsystems/ai-agent-toolkit": "1.0.4",
+    "@radiustechsystems/ai-agent-wallet": "1.0.4",
+    "@types/pg": "^8.10.9",
+    "@types/react": "^19.1.2",
+    "@types/react-dom": "^19.1.2",
+    "@types/react-router-dom": "^5.3.3",
+    "@types/socket.io-client": "^1.4.36",
+    "cors": "2.8.5",
+    "dotenv": "16.4.7",
+    "express": "4.21.2",
+    "react": "^19.1.0",
+    "react-dom": "^19.1.0",
+    "react-router-dom": "^7.5.1",
+    "socket.io": "4.8.1",
+    "socket.io-client": "^4.8.1"
+  }
+}
