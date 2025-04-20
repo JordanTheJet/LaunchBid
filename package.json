@@ -5,8 +5,8 @@
   "main": "dist/server.js",
   "scripts": {
     "dev": "ts-node server.ts",
-    "dev:react": "webpack serve --mode development",
-    "build": "tsc && webpack --mode production && cp -R public dist/public",
+    "dev:react": "cd frontend && webpack serve --mode development",
+    "build": "tsc && cd frontend && webpack --mode production && cd .. && mkdir -p dist/public && cp -R frontend/public dist/",
     "start": "node dist/server.js"
   },
   "keywords": [],
