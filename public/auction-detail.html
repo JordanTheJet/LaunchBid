@@ -355,7 +355,7 @@
     
     // Update bid display
     function updateCurrentBidDisplay(usdt) {
-      const ethEquivalent = (usdt * 0.0005).toFixed(5);
+      const ethEquivalent = (usdt * 0.0005).toFixed(5); //replace this formula with api to get USD/ETH conversion price
       document.getElementById('currentBid').textContent = `$${usdt.toFixed(2)} USDT / ${ethEquivalent} ETH`;
       
       // Update the Place Bid button to show the next bid value
@@ -475,7 +475,7 @@
       
       // Calculate the new bid amount
       let newBid = currentBid + 0.01; // new bid in USDT
-      let bidFeeEth = (newBid * 0.0005).toFixed(6);
+      let bidFeeEth = (newBid * 0.0005).toFixed(6); // REPLACE HARD CODED FEE FORMULA WITH actual ETH GAS/FEE PRICE
       
       const companyWallet = "0x4b19581c2bA3e781f834b25C11D81A590AfACEA4"; // Company wallet hard coded
       try {
