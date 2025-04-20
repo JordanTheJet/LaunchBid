@@ -4,6 +4,31 @@ import path from 'path';
 import http from 'http';
 import { Server } from 'socket.io';
 import 'dotenv/config';
+// Import dependencies
+import { Pool } from 'pg';
+
+// Load environment variables (if using dotenv for local dev)
+require('dotenv').config(); 
+
+// Initialize database connection
+const pool = new Pool({
+  connectionString: process.env.DATABASE_URL,
+  // Required for Render's PostgreSQL:
+  ssl: { 
+    rejectUnauthorized: false 
+  }
+});
+
+// Test the connection (add this to your startup code)
+async function testConnection() {
+  try {
+    await pool.query('SELECT 1');
+    console.log('✅ Database connected');
+  } catch (err) {
+    console.error('❌ Database connection error:', err);
+  }
+}
+testConnection();
 
 const app = express();
 const server = http.createServer(app);
