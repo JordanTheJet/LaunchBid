@@ -164,6 +164,113 @@ const placeBidHandler: RequestHandler = async (req: Request, res: Response): Pro
 // Handle bid placement via API
 app.post('/api/placeBid', placeBidHandler);
 
+// Authentication middleware
+const authenticateJWT: RequestHandler = (req: any, res: Response, next: any) => {
+  // For development purposes, we'll allow all requests without authentication
+  // In production, you should implement proper JWT authentication
+  next();
+};
+
+// Get all auctions
+app.get('/api/auctions', async (req: Request, res: Response) => {
+  try {
+    // For now, just return the single auction we have in memory
+    // In a real app, you would query the database
+    const auctionResponse = {
+      id: 1,
+      title: 'Echo Smart Speaker Pro',
+      description: 'A smart speaker with voice control and premium sound',
+      imageUrl: 'https://images.unsplash.com/photo-1589003077984-894e133dabab?ixlib=rb-1.2.1&auto=format&fit=crop&w=1350&q=80',
+      category: 'TECH',
+      retailPrice: 199.00,
+      currentBid: auction.currentBid,
+      bidCount: auction.bidCount,
+      timeRemaining: auction.timeRemaining,
+      lastBidder: auction.lastBidder,
+      isActive: auction.isActive
+    };
+    
+    res.json({ 
+      success: true, 
+      auctions: [auctionResponse]
+    });
+  } catch (error: any) {
+    console.error('Error fetching auctions:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || String(error) 
+    });
+  }
+});
+
+// ADMIN API ENDPOINTS
+// Create a new auction
+app.post('/api/admin/auctions', authenticateJWT, async (req: Request, res: Response) => {
+  try {
+    const { title, description, startingPrice, retailPrice, category, timeRemaining, imageUrl } = req.body;
+    
+    if (!title || !startingPrice || !retailPrice) {
+      return res.status(400).json({ 
+        success: false, 
+        error: 'Missing required auction data' 
+      });
+    }
+    
+    // Log the data (in a real app, you would save to database)
+    console.log('Creating new auction:', { 
+      title, description, startingPrice, retailPrice, category, timeRemaining, imageUrl 
+    });
+    
+    // Create a mock auction response
+    const newAuction = {
+      id: Math.floor(Math.random() * 1000) + 2, // Random ID (not 1, which is our in-memory auction)
+      title,
+      description,
+      imageUrl,
+      category,
+      retailPrice,
+      currentBid: startingPrice,
+      bidCount: 0,
+      timeRemaining,
+      lastBidder: null,
+      isActive: true
+    };
+    
+    res.json({ 
+      success: true, 
+      auction: newAuction
+    });
+  } catch (error: any) {
+    console.error('Error creating auction:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || String(error) 
+    });
+  }
+});
+
+// Delete an auction
+app.delete('/api/admin/auctions/:id', authenticateJWT, async (req: Request, res: Response) => {
+  try {
+    const id = parseInt(req.params.id);
+    
+    // Log the delete request (in a real app, you would delete from database)
+    console.log(`Deleting auction with ID: ${id}`);
+    
+    // Simulate successful deletion
+    res.json({ 
+      success: true, 
+      message: `Auction ${id} deleted successfully`
+    });
+  } catch (error: any) {
+    console.error('Error deleting auction:', error);
+    res.status(500).json({ 
+      success: false, 
+      error: error.message || String(error) 
+    });
+  }
+});
+
 // When a new client connects, send them the current auction state
 io.on('connection', (socket) => {
   console.log('Client connected');
