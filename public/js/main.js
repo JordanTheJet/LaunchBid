@@ -9,6 +9,7 @@ document.addEventListener('DOMContentLoaded', function() {
     initializeCards();
     initializeTooltips();
     initializeCountdowns();
+    initializeDatabaseMessages();
     
     // Check if user is logged in
     checkUserAuthentication();
@@ -230,4 +231,162 @@ document.addEventListener('DOMContentLoaded', function() {
         notification.remove();
       }, 300);
     }, 3000);
+  }
+  
+  /**
+   * Initialize Database Messages functionality
+   */
+  function initializeDatabaseMessages() {
+    // Only initialize if we're on a page with the message components
+    const messageContainer = document.getElementById('messageContainer');
+    const senderInput = document.getElementById('senderInput');
+    const messageInput = document.getElementById('messageInput');
+    const sendButton = document.getElementById('sendButton');
+    const connectionStatus = document.getElementById('connectionStatus');
+    
+    if (!messageContainer || !senderInput || !messageInput || !sendButton) {
+      return; // Not on a page with database messaging
+    }
+    
+    // Initialize Socket.io connection for real-time updates
+    const socket = io();
+    
+    // Handle socket connection events
+    socket.on('connect', () => {
+      updateConnectionStatus(true);
+      fetchMessages();
+    });
+    
+    socket.on('disconnect', () => {
+      updateConnectionStatus(false);
+    });
+    
+    // Listen for new messages
+    socket.on('newMessage', (message) => {
+      addMessageToUI(message);
+    });
+    
+    // Add click event for send button
+    sendButton.addEventListener('click', () => {
+      sendMessage();
+    });
+    
+    // Allow pressing Enter to send message
+    messageInput.addEventListener('keypress', (e) => {
+      if (e.key === 'Enter') {
+        sendMessage();
+      }
+    });
+    
+    // Function to send a message
+    function sendMessage() {
+      const sender = senderInput.value.trim();
+      const message = messageInput.value.trim();
+      
+      if (!sender) {
+        showNotification('Please enter your name', 'error');
+        return;
+      }
+      
+      if (!message) {
+        showNotification('Please enter a message', 'error');
+        return;
+      }
+      
+      // Send message to server
+      fetch('/api/messages', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json'
+        },
+        body: JSON.stringify({ sender, message })
+      })
+      .then(response => response.json())
+      .then(data => {
+        if (data.success) {
+          messageInput.value = ''; // Clear message input
+          showNotification('Message sent', 'success');
+        } else {
+          showNotification('Error: ' + data.error, 'error');
+        }
+      })
+      .catch(error => {
+        showNotification('Error sending message: ' + error, 'error');
+      });
+    }
+    
+    // Function to fetch messages from the server
+    function fetchMessages() {
+      messageContainer.innerHTML = '<div class="text-center text-gray-500 py-4">Loading messages...</div>';
+      
+      fetch('/api/messages')
+        .then(response => response.json())
+        .then(data => {
+          if (data.success) {
+            messageContainer.innerHTML = '';
+            
+            if (data.messages.length === 0) {
+              messageContainer.innerHTML = '<div class="text-center text-gray-500 py-4">No messages yet. Be the first to send one!</div>';
+              return;
+            }
+            
+            // Add messages to UI
+            data.messages.forEach(message => {
+              addMessageToUI(message);
+            });
+          } else {
+            messageContainer.innerHTML = '<div class="text-center text-red-500 py-4">Error loading messages</div>';
+          }
+        })
+        .catch(error => {
+          messageContainer.innerHTML = '<div class="text-center text-red-500 py-4">Error connecting to server</div>';
+        });
+    }
+    
+    // Function to add a message to the UI
+    function addMessageToUI(message) {
+      // Create message element
+      const messageElement = document.createElement('div');
+      messageElement.className = 'bg-white p-3 rounded-lg mb-2 shadow-sm border border-gray-100';
+      
+      // Format the timestamp
+      const date = new Date(message.created_at);
+      const formattedTime = date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+      const formattedDate = date.toLocaleDateString();
+      
+      // Set the message content
+      messageElement.innerHTML = `
+        <div class="flex justify-between">
+          <span class="font-medium text-primary">${escapeHTML(message.sender)}</span>
+          <span class="text-xs text-gray-500">${formattedDate} ${formattedTime}</span>
+        </div>
+        <p class="text-black mt-1">${escapeHTML(message.message)}</p>
+      `;
+      
+      // Add the message to the container (at the beginning for newest first)
+      messageContainer.insertBefore(messageElement, messageContainer.firstChild);
+    }
+    
+    // Update connection status indicator
+    function updateConnectionStatus(connected) {
+      if (connected) {
+        connectionStatus.innerHTML = '<span class="inline-block w-3 h-3 rounded-full bg-green-500 mr-2"></span> Connected';
+        connectionStatus.classList.remove('text-red-500');
+        connectionStatus.classList.add('text-primary');
+      } else {
+        connectionStatus.innerHTML = '<span class="inline-block w-3 h-3 rounded-full bg-red-500 mr-2"></span> Disconnected';
+        connectionStatus.classList.remove('text-primary');
+        connectionStatus.classList.add('text-red-500');
+      }
+    }
+    
+    // Helper function to escape HTML to prevent XSS
+    function escapeHTML(str) {
+      return str
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
   }

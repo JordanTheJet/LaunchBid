@@ -24,6 +24,17 @@ async function testConnection() {
   try {
     await pool.query('SELECT 1');
     console.log('✅ Database connected');
+    
+    // Create messages table if it doesn't exist
+    await pool.query(`
+      CREATE TABLE IF NOT EXISTS messages (
+        id SERIAL PRIMARY KEY,
+        sender VARCHAR(255) NOT NULL,
+        message TEXT NOT NULL,
+        created_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP
+      )
+    `);
+    console.log('✅ Messages table ready');
   } catch (err) {
     console.error('❌ Database connection error:', err);
   }
@@ -155,6 +166,42 @@ const placeBidHandler: RequestHandler = async (req: Request, res: Response): Pro
 
 // Handle bid placement via API
 app.post('/api/placeBid', placeBidHandler);
+
+// Message API endpoints
+app.post('/api/messages', async (req: Request, res: Response) => {
+  try {
+    const { sender, message } = req.body;
+    
+    if (!sender || !message) {
+      return res.status(400).json({ success: false, error: 'Sender and message are required' });
+    }
+    
+    const result = await pool.query(
+      'INSERT INTO messages (sender, message) VALUES ($1, $2) RETURNING *',
+      [sender, message]
+    );
+    
+    // Broadcast new message to all connected clients
+    io.emit('newMessage', result.rows[0]);
+    
+    res.json({ success: true, message: result.rows[0] });
+  } catch (error: any) {
+    console.error('Error saving message:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/messages', async (req: Request, res: Response) => {
+  try {
+    const result = await pool.query(
+      'SELECT * FROM messages ORDER BY created_at DESC LIMIT 10'
+    );
+    res.json({ success: true, messages: result.rows });
+  } catch (error: any) {
+    console.error('Error fetching messages:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
 
 // When a new client connects, send them the current auction state
 io.on('connection', (socket) => {
