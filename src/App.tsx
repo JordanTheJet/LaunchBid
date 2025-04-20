@@ -5,6 +5,7 @@ import Footer from './components/Footer';
 import AuctionDetail from './components/AuctionDetail';
 import Auctions from './components/Auctions';
 import Equity from './components/Equity';
+import Dashboard from './components/Dashboard';
 import Loans from './components/Loans';
 import Home from './components/Home';
 
@@ -19,6 +20,7 @@ const App: React.FC = () => {
           <Route path="/auction-detail/:id" element={<AuctionDetail />} />
           <Route path="/equity" element={<Equity />} />
           <Route path="/loans" element={<Loans />} />
+          <Route path="/dashboard" element={<Dashboard />} />
         </Routes>
       </main>
       <Footer />
