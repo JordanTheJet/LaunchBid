@@ -76,7 +76,7 @@ const timerInterval = setInterval(() => {
   }
 
   if (auction.timeRemaining <= 0) {
-    timeRemaining: 10
+    auction.timeRemaining = 10
     // auction.isActive = false;
     // clearInterval(timerInterval);
     // io.emit('auctionEnded', { 
