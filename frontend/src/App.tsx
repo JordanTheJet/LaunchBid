@@ -7,6 +7,7 @@ import Auctions from './components/Auctions';
 import Equity from './components/Equity';
 import Loans from './components/Loans';
 import Home from './components/Home';
+import Dashboard from './components/Dashboard'; // Add import for Dashboard
 
 const App: React.FC = () => {
   return (
@@ -19,6 +20,7 @@ const App: React.FC = () => {
           <Route path="/auction-detail/:id" element={<AuctionDetail />} />
           <Route path="/equity" element={<Equity />} />
           <Route path="/loans" element={<Loans />} />
+          <Route path="/dashboard" element={<Dashboard />} /> {/* Add route for Dashboard */}
         </Routes>
       </main>
       <Footer />
