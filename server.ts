@@ -43,10 +43,18 @@ const PORT = process.env.PORT || 3000;
 
 app.use(cors());
 app.use(express.json());
+// Serve static files from the React app in production
+// In development, React app is served by webpack-dev-server on a different port
 app.use(express.static(path.join(__dirname, 'public')));
 
-// Serve index.html at root
-app.get('/', (req: Request, res: Response) => {
+// Serve React app for all routes except API routes
+app.get('*', (req: Request, res: Response) => {
+  // If it's an API request, let it pass through to the API routes
+  if (req.path.startsWith('/api')) {
+    return;
+  }
+  
+  // Otherwise serve the React app
   res.sendFile(path.join(__dirname, 'public', 'index.html'));
 });
 
