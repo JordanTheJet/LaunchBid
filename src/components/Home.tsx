@@ -49,7 +49,7 @@ const Home: React.FC = () => {
                 <div className="text-primary font-medium">$5.00</div>
                 <div className="text-gray-500 text-sm">30s left</div>
               </div>
-              <Link to="/auction-detail" className="block text-center bg-primary text-white py-2 rounded-lg mt-3">View Auction</Link>
+              <Link to="/auction-detail/wireless-earbuds" className="block text-center bg-primary text-white py-2 rounded-lg mt-3">View Auction</Link>
             </div>
           </div>
           
@@ -61,7 +61,7 @@ const Home: React.FC = () => {
                 <div className="text-primary font-medium">$9.64</div>
                 <div className="text-gray-500 text-sm">4h 23m left</div>
               </div>
-              <Link to="/auction-detail" className="block text-center bg-primary text-white py-2 rounded-lg mt-3">View Auction</Link>
+              <Link to="/auction-detail/portable-speaker" className="block text-center bg-primary text-white py-2 rounded-lg mt-3">View Auction</Link>
             </div>
           </div>
           
@@ -73,7 +73,7 @@ const Home: React.FC = () => {
                 <div className="text-primary font-medium">$8.75</div>
                 <div className="text-gray-500 text-sm">3h 45m left</div>
               </div>
-              <Link to="/auction-detail" className="block text-center bg-primary text-white py-2 rounded-lg mt-3">View Auction</Link>
+              <Link to="/auction-detail/fitness-tracker" className="block text-center bg-primary text-white py-2 rounded-lg mt-3">View Auction</Link>
             </div>
           </div>
         </div>

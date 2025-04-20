@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Link } from 'react-router-dom';
+import { Link, useParams } from 'react-router-dom';
 import io from 'socket.io-client';
 import * as ethers from 'ethers';
 
@@ -59,8 +59,24 @@ const defaultProps: ItemProps = {
 };
 
 const AuctionDetail: React.FC = () => {
+  // Get the auction ID from the URL
+  const { id } = useParams<{ id: string }>();
+  
   // State variables
   const [item, setItem] = useState<ItemProps>(defaultProps);
+  
+  // Fetch auction data based on ID
+  useEffect(() => {
+    // In a real application, we would fetch the auction data from the server
+    // For now, we'll just use the default props
+    console.log(`Fetching auction data for ID: ${id}`);
+    
+    // Example of how to fetch data from an API:
+    // fetch(`/api/auctions/${id}`)
+    //   .then(response => response.json())
+    //   .then(data => setItem(data))
+    //   .catch(error => console.error('Error fetching auction data:', error));
+  }, [id]);
   const [socket, setSocket] = useState<any>(null);
   const [bidHistory, setBidHistory] = useState<Array<{
     bidderWallet: string;
