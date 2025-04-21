@@ -10,25 +10,33 @@ import { Pool } from 'pg';
 // Load environment variables (if using dotenv for local dev)
 require('dotenv').config(); 
 
-// Initialize database connection
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-  // Required for Render's PostgreSQL:
-  ssl: { 
-    rejectUnauthorized: false 
-  }
-});
+// Initialize database connection if DATABASE_URL is provided
+let pool: any = null;
+if (process.env.DATABASE_URL) {
+  pool = new Pool({
+    connectionString: process.env.DATABASE_URL,
+    // Required for Render's PostgreSQL:
+    ssl: { 
+      rejectUnauthorized: false 
+    }
+  });
 
-// Test the connection (add this to your startup code)
-async function testConnection() {
-  try {
-    await pool.query('SELECT 1');
-    console.log('✅ Database connected');
-  } catch (err) {
-    console.error('❌ Database connection error:', err);
+  // Test the connection
+  async function testConnection() {
+    try {
+      if (pool) {
+        await pool.query('SELECT 1');
+        console.log('✅ Database connected');
+      }
+    } catch (err) {
+      console.error('❌ Database connection error:', err);
+      console.log('Continuing without database connection for local development');
+    }
   }
+  testConnection();
+} else {
+  console.log('⚠️ No DATABASE_URL provided, running without database connection');
 }
-testConnection();
 
 const app = express();
 const server = http.createServer(app);
@@ -172,7 +180,7 @@ const authenticateJWT: RequestHandler = (req: any, res: Response, next: any) => 
 };
 
 // Get all auctions
-app.get('/api/auctions', async (req: Request, res: Response) => {
+app.get('/api/auctions', async (req: Request, res: Response): Promise<void> => {
   try {
     // For now, just return the single auction we have in memory
     // In a real app, you would query the database
@@ -205,15 +213,16 @@ app.get('/api/auctions', async (req: Request, res: Response) => {
 
 // ADMIN API ENDPOINTS
 // Create a new auction
-app.post('/api/admin/auctions', authenticateJWT, async (req: Request, res: Response) => {
+app.post('/api/admin/auctions', authenticateJWT, async (req: Request, res: Response): Promise<void> => {
   try {
     const { title, description, startingPrice, retailPrice, category, timeRemaining, imageUrl } = req.body;
     
     if (!title || !startingPrice || !retailPrice) {
-      return res.status(400).json({ 
+      res.status(400).json({ 
         success: false, 
         error: 'Missing required auction data' 
       });
+      return;
     }
     
     // Log the data (in a real app, you would save to database)
@@ -250,7 +259,7 @@ app.post('/api/admin/auctions', authenticateJWT, async (req: Request, res: Respo
 });
 
 // Delete an auction
-app.delete('/api/admin/auctions/:id', authenticateJWT, async (req: Request, res: Response) => {
+app.delete('/api/admin/auctions/:id', authenticateJWT, async (req: Request, res: Response): Promise<void> => {
   try {
     const id = parseInt(req.params.id);
     
